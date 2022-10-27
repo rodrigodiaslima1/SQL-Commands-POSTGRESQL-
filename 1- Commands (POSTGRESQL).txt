@@ -1,4 +1,6 @@
 
+-- SQL COMMANDS (USING POSTGRESQL)
+
 -- 0.   Create dataBase
 -- 1.1  Create table
 -- 1.2  Clear table
@@ -24,7 +26,7 @@
 -- 16. Delete: Data from the table
 -- 17. Delete: ALL from table
 
--- DQL: Data Query Language -------------------
+-- DQL: Data Query Language --------------------------
 -- 18. Select: All
 -- 19. Select: where
 -- 20. Select: where ... like
@@ -38,6 +40,20 @@
 -- 28. Select: No repetion
 -- 29. Select: in
 -- 30. Select: between
+
+-- Other stuff ----------------------------------------
+-- 31. Index:
+-- 32. Primary Key
+-- 33. Foreign Key:
+-- 34. Constraints: Unique: won't accept repeated values in the column												 
+-- 35. Constraints: Sequence: a sequence of values 
+-- 36. Constraints: Sequence: get the current sequence value
+-- 37. Constraints: Sequence: get next sequence value
+-- 38. Inner Join
+-- 39. Left Join
+-- 40. Right Join
+-- 41. Full Join
+-- 42. Cross Join
 
 ---------------------------------------------------
 
@@ -222,8 +238,198 @@ select * from tb_person1
 where age between 1 and 50;
 
 
+-- Other stuff ----------------------------------------
 
+-- 31. Index:
+create index idx_tb_person1 on tb_person1(middle_name);
+
+-- 32. Constraints: Primary Key: They are idexed, unique and not null
+create table tb_person3(
+	
+	id bigint,
+	first_name varchar(50),
+	middle_name varchar(50),
+	last_name varchar(50),
+	cpf bigint,
+	phone bigint,
+	age smallint constraint age_check check (age > 0 and age < 120),
+	
+	constraint pk_id_tb_person3 primary key (id)
+	
+);
+
+-- OR
+
+create table tb_person3(
+	
+	id bigint primary key,
+	first_name varchar(50),
+	middle_name varchar(50),
+	last_name varchar(50),
+	cpf bigint,
+	phone bigint,
+	age smallint constraint age_check check (age > 0 and age < 120)
+	
+);
+
+-- OR
+
+alter table tb_person3
+add constraint pk_id_tb_person3
+primary key (id);
+
+-- 33. Constraints: Foreign Key:
+create table tb_country(
+
+	id int primary key,
+	country varchar(50)
+
+);
+
+create table tb_person4(
+	
+	id bigint,
+	first_name varchar(50),
+	middle_name varchar(50),
+	last_name varchar(50),
+	cpf bigint,
+	phone bigint,
+	age smallint constraint age_check check (age > 0 and age < 120),
+	id_country int,
+	
+	constraint pk_id_tb_person4 primary key (id),
+	constraint fk_id_country_tb_person4 foreign key (id_country) references tb_country(id)
+	
+);
+
+-- OR
+
+alter table tb_person4
+add constraint fk_id_country_tb_person4 foreign key (id_country references tb_country(id);
+													 
+-- 34. Constraints: Unique: won't accept repeated values in the column
+create table tb_person5(
+	
+	id bigint,
+	first_name varchar(50),
+	middle_name varchar(50),
+	last_name varchar(50),
+	cpf bigint,
+	phone bigint,
+	age smallint constraint age_check check (age > 0 and age < 120),
+	id_country int,
+	
+	constraint pk_id_tb_person5 primary key (id),
+	constraint fk_id_country_tb_person5 foreign key (id_country) references tb_country(id),
+	constraint unique_cpf_tb_person5 unique (cpf)
+	
+);
+													 
+-- OR													 
+
+alter table tb_person5
+add constraint unique_cpf_tb_person5 unique (cpf);
+
+-- 35. Constraints: Sequence: a sequence of values that can be used
+-- in columns with autoincrement values:
+create sequence sq_tb_person1
+start 2 increment 1 -- here we start at 2 because we have already one data on the DB
+owned by tb_person1.id;
+													 
+-- to insert using this value:
+insert into tb_person1(id, first_name, cpf)
+values (nextval('sq_tb_person1'), 'Christina', 312645978);
+
+-- 36. Constraints: Sequence: get the current sequence value
+select currval('sq_tb_person1');
+
+-- 37. Constraints: Sequence: get next sequence value
+select nextval('sq_tb_person1');
+
+-- 38. Inner Join: combination of values from tab1 and tab2. It makes a
+-- comparation between them. If they are the same, a join is made between
+-- both tabs. Values that don't mach, are ignored and not returned
+
+-- 1.1: without inner join (same result)
+select * 
+from tb_person4 person, tb_country country
+where person.id_country = country.id;
+-- 1.2: with inner join (same result)
+select *
+from tb_person4 person
+inner join tb_country country
+on person.id_country = country.id;
+
+-- 2.1: without inner join (same result)
+select person.id, person.first_name person_name, country.id, country.country nationality
+from tb_person4 person, tb_country country
+where person.id_country = country.id;
+-- 2.2: with inner join (same result)
+select person.id, person.first_name person_name, country.id, country.country nationality
+from tb_person4 person
+inner join tb_country country on country.id = person.id_country
+													 
+-- 3.1: without inner join (same result)
+select person.id, person.first_name as person_name, country.id, country.country as nationality
+from tb_person4 as person, tb_country as country
+where person.id_country = country.id;
+-- 3.2: with inner join (same result)	
+select person.id, person.first_name as person_name, country.id, country.country as nationality
+from tb_person4 as person
+inner join tb_country as country on country.id = person.id_country;												 
+													 
+-- the tb_country and tb_person4 are used as examples:
+create table tb_country(
+
+	id int primary key,
+	country varchar(50)
+
+);
+
+create table tb_person4(
+	
+	id bigint,
+	first_name varchar(50),
+	middle_name varchar(50),
+	last_name varchar(50),
+	cpf bigint,
+	phone bigint,
+	age smallint constraint age_check check (age > 0 and age < 120),
+	id_country int,
+	
+	constraint pk_id_tb_person4 primary key (id),
+	constraint fk_id_country_tb_person4 foreign key (id_country) references tb_country(id)
+	
+);
+
+-- 39. Left Join: values that don't match, are returned, even so, with a NULL value:
+select *
+from tb_person4 person
+left join tb_country country
+on person.id_country = country.id;												 
+
+
+-- 40. Right Join:
+
+-- 41. Full Join: same as left and right join. Registers which do not have a pair
+-- will show up as NULL, in the right side or left side
+select *
+from tb_person4 person
+full join tb_country country
+on person.id_country = country.id;		
+
+-- 42. Cross Join: A very dangerous move here. Cross Join will brig all entries.
+-- of joins, making repetions with the information for each of the columns from
+-- both sides; (*** DO NOT USE IT ***)
+select *
+from tb_person4 person
+cross join tb_country 								
+													 
+													 
+													 
 -----------------------------------------------------
+													 
+													
 -- 0.   Create dataBase
 -- 1.1  Create table
 -- 1.2  Clear table
@@ -249,7 +455,7 @@ where age between 1 and 50;
 -- 16. Delete: Data from the table
 -- 17. Delete: ALL from table
 
--- DQL: Data Query Language -------------------
+-- DQL: Data Query Language --------------------------
 -- 18. Select: All
 -- 19. Select: where
 -- 20. Select: where ... like
@@ -264,11 +470,19 @@ where age between 1 and 50;
 -- 29. Select: in
 -- 30. Select: between
 
-
-
-
-
-
+-- Other stuff ----------------------------------------
+-- 31. Index:
+-- 32. Primary Key
+-- 33. Foreign Key:
+-- 34. Constraints: Unique: won't accept repeated values in the column												 
+-- 35. Constraints: Sequence: a sequence of values 
+-- 36. Constraints: Sequence: get the current sequence value
+-- 37. Constraints: Sequence: get next sequence value
+-- 38. Inner Join
+-- 39. Left Join
+-- 40. Right Join
+-- 41. Full Join
+-- 42. Cross Join
 
 
 
