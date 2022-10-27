@@ -1,4 +1,4 @@
-<img src="https://cdn.icon-icons.com/icons2/2415/PNG/512/postgresql_original_wordmark_logo_icon_146392.png" width="200">
+<img src="https://cdn.icon-icons.com/icons2/2415/PNG/512/postgresql_original_wordmark_logo_icon_146392.png" width="100">
 <h1>SQL Commands (PostgreSQL)</h1>
 
 <p><em>This repository is dedicated to store a brief list of basic commands used
