@@ -185,6 +185,10 @@ values (2, 'Robin', 'F');
 update tb_person1 set first_name = 'George'
 where id = 2;
 
+-- 15.1 Update: Change a value in MANY entries
+update tb_person1 set age = 100
+where id=1 and id=2 and id=3;
+
 -- 16. Delete: Data from the table
 delete from tb_person1 where id = 2;
 
